@@ -8,8 +8,8 @@ RWKV "x60a" model - does not require custom CUDA kernel to train :)
 References:
 https://github.com/BlinkDL/RWKV-LM
 
-Inference:
-Always fast, and VRAM will not grow, because RWKV does not need KV cache.
+modification of RWKV v6 rnn mode to support batches of data to support
+training using the rnn mode
 """
 
 
