@@ -48,46 +48,36 @@ class SeqMNIST(pl.LightningModule):
         y_hat = self.forward(x)
         loss = F.cross_entropy(y_hat, y)
         accuracy = (y_hat.argmax(1) == y).float().mean()
-        return {'loss': loss, 'train_accuracy': accuracy}
-
-    def training_end(self, outputs):
-        # TODO: how to get this called?
-        avg_accuracy = torch.stack([x['train_accuracy'] for x in outputs]).mean()
-        return {'avg_train_accuracy': avg_accuracy}
+        self.log("loss", loss, prog_bar=True)
+        self.log("train_accuracy", accuracy, prog_bar=True)
+        return loss
 
     def validation_step(self, batch, batch_nb):
         x, y = batch
         y_hat = self.forward(x)
+        loss = F.cross_entropy(y_hat, y)
         accuracy = (y_hat.argmax(1) == y).float().mean()
-        return {'val_accuracy': accuracy}
-
-    def validation_end(self, outputs):
-        avg_accuracy = torch.stack([x['val_accuracy'] for x in outputs]).mean()
-        return {'avg_val_accuracy': avg_accuracy}
+        self.log("val_loss", loss, prog_bar=True)
+        self.log("val_accuracy", accuracy, prog_bar=True)
+        return loss
 
     def test_step(self, batch, batch_nb):
-        # TODO: how to get this called?
         x, y = batch
         y_hat = self.forward(x)
+        loss = F.cross_entropy(y_hat, y)
         accuracy = (y_hat.argmax(1) == y).float().mean()
-        return {'test_accuracy': accuracy}
-
-    def test_end(self, outputs):
-        # TODO: how to get this called?
-        avg_accuracy = torch.stack([x['test_accuracy'] for x in outputs]).mean()
-        return {'avg_test_accuracy': avg_accuracy}
+        self.log("test_loss", loss, prog_bar=True)
+        self.log("test_accuracy", accuracy, prog_bar=True)
+        return loss
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
 
-    @pl.data_loader
-    def tng_dataloader(self):
-        return DataLoader(self.train_dataset, batch_size=self.default_batch_size)
+    def train_dataloader(self):
+        return DataLoader(self.train_dataset, batch_size=self.default_batch_size, num_workers=8)
 
-    @pl.data_loader
     def val_dataloader(self):
-        return DataLoader(self.val_dataset, batch_size=self.default_batch_size)
+        return DataLoader(self.val_dataset, batch_size=self.default_batch_size, num_workers=8)
 
-    @pl.data_loader
     def test_dataloader(self):
-        return DataLoader(self.test_dataset, batch_size=self.default_batch_size)
+        return DataLoader(self.test_dataset, batch_size=self.default_batch_size, num_workers=8)

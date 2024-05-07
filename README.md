@@ -1,7 +1,9 @@
-This is a quick implementation of sequential MNIST, using [PyTorch Lightning](https://github.com/williamFalcon/pytorch-lightning).
+Modification of RWKV V6 RNN mode to support batches of data
+
+increasing size of the model increases performance as expected
+
+Training using [PyTorch Lightning](https://github.com/williamFalcon/pytorch-lightning).
 
 #### Visualization
 
-Run `tensorboard --logdir experiments` to visualize results in real time:
-
-![Tensorboard Screenshot](img/tensorboard2.png)
+![Tensorboard Screenshot](img/image.png)
