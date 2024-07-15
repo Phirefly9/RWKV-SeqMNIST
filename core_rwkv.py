@@ -194,6 +194,8 @@ class RWKV_Tmix_x060c(nn.Module):
         k = self.key(xk)
         v = self.value(xv)
         w = self.time_decay + (torch.tanh(xw @ self.time_decay_w1) @ self.time_decay_w2)
+        w = torch.exp(-torch.exp(w.float()))
+
 
         k = k * (1-(-w.exp()).exp())
 
