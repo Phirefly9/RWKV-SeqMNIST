@@ -113,7 +113,7 @@ class RWKV_Tmix_x070rc2(nn.Module):
         b = b.view(B, T, H, S).float()
         w = torch.exp(-torch.exp(w.view(B, T, H, S).float()))
 
-        ret = []
+        ret = torch.zeros_like(v)
         for t in range(T):
             kk = k[:, t, :]
             rr = r[:, t, :]
@@ -123,9 +123,8 @@ class RWKV_Tmix_x070rc2(nn.Module):
 
             sab = torch.einsum('bhik,bhk,bhj->bhij', s, aa, bb)
             s = s * w[:, t, :, None, :] + sab + torch.einsum('bhj,bhi->bhij', kk, vv)
-            ret.append(torch.einsum('bhj,bhij->bhi', rr, s))
-
-        x = torch.stack(ret, dim=1)
+            ret[:, t, :] = torch.einsum('bhj,bhij->bhi', rr, s)
+        x = ret
         # end kernel
 
         new_state[:, (2+S)*i+2:(2+S)*(i+1), :] = s.reshape(B, S, -1)
